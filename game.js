@@ -192,6 +192,32 @@ function updateHighScore() {
         console.error('Error updating high scores:', error);
     }
 }
+const API_BASE = "https://as.JTGAMING2.repl.co"; // replace with your actual Replit URL
+
+function saveScoreToServer(username, score) {
+    fetch(`${API_BASE}/save_score`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, score })
+    })
+    .then(res => res.json())
+    .then(data => console.log(data.message))
+    .catch(err => console.error("Error saving score:", err));
+}
+
+function loadScores() {
+    fetch(`${API_BASE}/get_scores`)
+        .then(res => res.json())
+        .then(scores => {
+            const leaderboard = document.getElementById("leaderboard");
+            leaderboard.innerHTML = "<h2>Leaderboard</h2>";
+            scores.forEach((entry, i) => {
+                leaderboard.innerHTML += `<p>${i + 1}. ${entry.username} - ${entry.score}</p>`;
+            });
+        })
+        .catch(err => console.error("Failed to load leaderboard:", err));
+}
+
 
 
 
