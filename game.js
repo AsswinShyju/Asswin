@@ -192,7 +192,7 @@ function updateHighScore() {
         console.error('Error updating high scores:', error);
     }
 }
-const API_BASE = "https://as.JTGAMING2.repl.co"; // replace with your actual Replit URL
+const API_BASE = "https://as.jtgaming2.repl.co"; // replace with your actual Replit URL
 
 function saveScoreToServer(username, score) {
     fetch(`${API_BASE}/save_score`, {
