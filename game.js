@@ -133,14 +133,47 @@ function drawBird() {
 
 
 }
+const SHEETDB_URL = "https://sheetdb.io/api/v1/cm755dbmu51mp"; // Replace with your real SheetDB URL
+
+function saveScoreToSheetDB(username, score) {
+    fetch(SHEETDB_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            data: [{ username, score }]
+        })
+    })
+    .then(res => res.json())
+    .then(data => console.log("Score saved to SheetDB:", data))
+    .catch(err => console.error("Error saving to SheetDB:", err));
+}
+
+function loadScoresFromSheetDB() {
+    fetch(SHEETDB_URL)
+        .then(res => res.json())
+        .then(data => {
+            const leaderboard = document.getElementById("leaderboard");
+            leaderboard.innerHTML = "<h2>Leaderboard</h2>";
+            const sorted = data.sort((a, b) => parseInt(b.score) - parseInt(a.score));
+            sorted.forEach((entry, i) => {
+                leaderboard.innerHTML += `<p>${i + 1}. ${entry.username} - ${entry.score}</p>`;
+            });
+        })
+        .catch(err => console.error("Error loading leaderboard:", err));
+}
+
 
 const currentUser = localStorage.getItem('currentUser'); // already in your script
 
 
 
 function resetGame() {
-    updateHighScore(); // <-- Save before resetting score
-    saveScore(score);  // <-- Save before resetting score
+    updateHighScore();
+    saveScore(score);
+
+    if (currentUser) {
+        saveScoreToSheetDB(currentUser, score); // <--- new SheetDB call
+    }
 
     bird.y = 150;
     bird.velocity = 0;
@@ -151,9 +184,8 @@ function resetGame() {
     ctx.font = "36px Arial";
     ctx.fillText("Game Over! Click to restart", 5, canvas.height / 2);
 
-    showLeaderboard(); // Refresh the leaderboard UI (if you have it)
+    loadScoresFromSheetDB(); // <--- fetch latest scores from SheetDB
 }
-
 
 function flap() {
     if (!gameStarted) {
